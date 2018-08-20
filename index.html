@@ -1,0 +1,135 @@
+<html>
+
+<head>
+    <title>
+        Homework 4
+    </title>
+    <script type="text/javascript">
+        function getlist(url) {
+
+            if (url.value.length == 0) {
+                alert("Enter file name");
+                return;
+            }
+
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url.value, false);
+
+            try{
+                xmlhttp.send();
+            }catch(e){
+                alert("File does not exist.");
+                return;
+            }
+
+            console.log(xmlhttp.status)
+
+            if (xmlhttp.status != 200) {
+                alert("File does not exist");
+                return;
+            } else {
+
+                jsonDoc = xmlhttp.responseText;
+
+                try {
+                    JSON.parse(jsonDoc);
+                } catch (e) {
+                    alert("Not a valid JSON file");
+                    return false;
+                }
+                var obj = JSON.parse(jsonDoc);
+
+
+                var h = obj.Mainline.Table.Header.Data;
+
+
+                var content;
+                content = "<html><head><title>Trucking Companies</title></head> ";
+                content += "<body>";
+
+                content += "<table border=1>";
+
+                for (n = 0; n < h.length; n += 1) {
+                    content += "<th>" + h[n] + "</th>";
+                }
+
+                if (obj.Mainline.Table.Row) {
+
+                    var r = obj.Mainline.Table.Row;
+
+                    for (n = 0; n < r.length; n += 1) {
+                        content += "<tr>";
+
+                        content += "<td>";
+                        if (r[n].Company)
+                            content += r[n].Company;
+                        content += "</td>";
+
+                        content += "<td>";
+                        if (r[n].Services)
+                            content += r[n].Services;
+                        content += "</td>";
+
+                        content += "<td><ul>";
+
+                        for (j = 0; j < r[n].Hubs.Hub.length; j += 1) {
+
+                            if (r[n].Hubs.Hub[j]) {
+                                content += "<li>";
+                                if (j == 0) {
+                                    content += "<b>" + r[n].Hubs.Hub[j] + "</b>";
+                                } else {
+                                    content += r[n].Hubs.Hub[j];
+                                }
+                                content += "</li>";
+                            }
+                        }
+                        content += "</ul></td>";
+
+                        content += "<td>";
+                        if (r[n].Revenue)
+                            content += r[n].Revenue;
+                        content += "</td>";
+
+                        content += "<td>";
+
+                        if (r[n].HomePage)
+                            content += "<a href=\"" + r[n].HomePage + "\">" + r[n].HomePage + "</a>";
+                        content += "</td>";
+
+                        content += "<td>";
+                        if (r[n].Logo)
+                            content += "<img width=400 src=\"" + r[n].Logo + "\">";
+                        content += "</td>"
+
+                        content += "</tr>";
+                    }
+
+                    content += "</table></body></html>";
+                    var x = window.open("", "","width=1500,height=800")
+                    x.document.open();
+                    x.document.write(content);
+                    x.document.close();
+                } else {
+                    alert("Empty Rows. No trucking companies found in JSON file.");
+                }
+
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+    <center>
+        <br>
+        <h3>Enter URL for Trucking List JSON File</h3>
+        <form action="#" onsubmit="getlist(truckname)">
+            <input type="text" name="truckname" placeholder="Enter filename here" autofocus><br>
+            <br>
+            <input type="submit" name="submitquery" value="Submit Query">
+        </form>
+    </center>
+</body>
+
+</html>
